@@ -431,7 +431,7 @@ namespace Renci.SshNet.Sftp
                 this.WaitHandle(wait, this._operationTimeout);
             }
 
-            if (exception != null && !(exception is SftpPathNotFoundException))
+            if (!nullOnError && exception != null)
             {
                 throw exception;
             }
@@ -471,7 +471,7 @@ namespace Renci.SshNet.Sftp
                 this.WaitHandle(wait, this._operationTimeout);
             }
 
-            if (exception != null)
+            if (!nullOnError && exception != null)
             {
                 throw exception;
             }

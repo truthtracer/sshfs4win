@@ -74,7 +74,7 @@ namespace DokanNet
                                           OpenDirectory = dokanOperationProxy.OpenDirectoryProxy,
                                           CreateDirectory = dokanOperationProxy.CreateDirectoryProxy,
                                           Cleanup = dokanOperationProxy.CleanupProxy,
-                                        //  CloseFile = dokanOperationProxy.CloseFileProxy,
+                                          CloseFile = dokanOperationProxy.CloseFileProxy,
                                           ReadFile = dokanOperationProxy.ReadFileProxy,
                                           WriteFile = dokanOperationProxy.WriteFileProxy,
                                           FlushFileBuffers = dokanOperationProxy.FlushFileBuffersProxy,
@@ -87,13 +87,13 @@ namespace DokanNet
                                           MoveFile = dokanOperationProxy.MoveFileProxy,
                                           SetEndOfFile = dokanOperationProxy.SetEndOfFileProxy,
                                           SetAllocationSize = dokanOperationProxy.SetAllocationSizeProxy,
-                                        //  LockFile = dokanOperationProxy.LockFileProxy,
-                                        //  UnlockFile = dokanOperationProxy.UnlockFileProxy,
+                                          LockFile = dokanOperationProxy.LockFileProxy,
+                                          UnlockFile = dokanOperationProxy.UnlockFileProxy,
                                           GetDiskFreeSpace = dokanOperationProxy.GetDiskFreeSpaceProxy,
                                           GetVolumeInformation = dokanOperationProxy.GetVolumeInformationProxy,
                                           Unmount = dokanOperationProxy.UnmountProxy,
-                                        //  GetFileSecurity = dokanOperationProxy.GetFileSecurityProxy,
-                                         // SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
+                                          GetFileSecurity = dokanOperationProxy.GetFileSecurityProxy,
+                                          SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
                                       };
 
            

@@ -35,9 +35,9 @@ namespace Renci.SshNet
             var ep = new IPEndPoint(addr, port);
             this._socket = new Socket(ep.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
-            var socketBufferSize = 2 * MAXIMUM_PACKET_SIZE;
+            var socketBufferSize = MAXIMUM_PACKET_SIZE;
 
-            //this._socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
+            this._socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
             this._socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, socketBufferSize);
             this._socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, socketBufferSize);
 

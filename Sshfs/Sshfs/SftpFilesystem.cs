@@ -57,7 +57,7 @@ namespace Sshfs
         private readonly MemoryCache _cache = MemoryCache.Default;
 
         private SftpSession _sftpSession;
-        private readonly TimeSpan _operationTimeout = TimeSpan.FromSeconds(30);//new TimeSpan(0, 0, 0, 0, -1);
+        private readonly TimeSpan _operationTimeout = TimeSpan.FromSeconds(120);//new TimeSpan(0, 0, 0, 0, -1);
         private string _rootpath;
 
         private readonly bool _useOfflineAttribute;
@@ -159,6 +159,13 @@ namespace Sshfs
             return Path.GetDirectoryName(path).Replace('\\', '/');
         }
         
+        private void EnsureParentDirExist(string path)
+        {
+            string parent_dir = GetUnixDirectoryName(path);
+            if (null == GetAttributes(parent_dir))
+                _sftpSession.RequestMkDir(parent_dir);
+        }
+
         [Conditional("DEBUG")]
         private void Log(string format, params object[] arg)
         {
@@ -289,9 +296,7 @@ namespace Sshfs
                         return DokanError.ErrorAlreadyExists;
 
                     // New file need create but parent directory not exists ?
-                    string parent_dir = GetUnixDirectoryName(path);
-                    if (null == GetAttributes(parent_dir))
-                        _sftpSession.RequestMkDir(parent_dir);
+                    EnsureParentDirExist(path);
 
                     InvalidateParentCache(fileName); // cache invalidate
                     break;
@@ -477,8 +482,7 @@ namespace Sshfs
 
                 Log("WriteFile:{0}:{1}|lenght:[{2}]|offset:[{3}]", fileName,
                     info.Context, buffer.Length, offset);
-               
-               
+
                 if (info.Context == null) // who would guess
                 {
                     var handle = _sftpSession.RequestOpen(GetUnixPath(fileName), Flags.Write);
@@ -494,7 +498,7 @@ namespace Sshfs
                     var stream = (info.Context as SftpContext).Stream;
                     lock (stream)
                     {
-                        stream.Position = offset;
+                        //stream.Position = offset;
                         stream.Write(buffer, 0, buffer.Length);
                     }
                     //    stream.Flush();
@@ -834,6 +838,8 @@ namespace Sshfs
                 info.Context = null;
                 try
                 {
+                    // New file need move but parent directory not exists ?
+                    EnsureParentDirExist(newpath);
                     _sftpSession.RequestRename(oldpath, newpath);
                     InvalidateParentCache(oldName);
                     InvalidateParentCache(newName);

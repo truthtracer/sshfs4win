@@ -25,7 +25,8 @@ namespace Sshfs
 {
     internal sealed class SftpContextStream : Stream
     {
-        private const int WRITE_BUFFER_SIZE = 28*1024;// (1024*32 - 38)*4;
+        // len limit for sshnet library = Session.MAXIMUM_PAYLOAD_SIZE - 38
+        private const int WRITE_BUFFER_SIZE = 1024 * 32 - 38;
         private const int READ_BUFFER_SIZE = 128*1024;
         private readonly byte[] _writeBuffer;
         private byte[] _readBuffer = new byte[0];
@@ -294,56 +295,38 @@ namespace Sshfs
             // Setup this object for writing.
             SetupWrite();
 
-            // Write data to the file stream.
-          // while (count > 0)
-         //   {
-                // Determine how many bytes we can write to the buffer.
-                int tempLen = WRITE_BUFFER_SIZE - _writeBufferPosition;
-
-              /*  if (tempLen <= 0)
-                {
-                   
-                    _session.RequestWrite(_handle, (ulong) (_position - WRITE_BUFFER_SIZE), _writeBuffer);
-
-                    _writeBufferPosition = 0;
-                    tempLen = WRITE_BUFFER_SIZE;
-                }*/
-
-
-            if (tempLen >= count)
+            var pos = 0;// pos of whole buffer needed to send
+            var len = 0;// len to send for every time
+            var len_left = buffer.Length;
+            var buf_tail = new byte[buffer.Length % WRITE_BUFFER_SIZE];
+            while (len_left > 0)
             {
-                // No: copy the data to the write buffer first.
-                Buffer.BlockCopy(buffer, offset, _writeBuffer, _writeBufferPosition, count);
-                _writeBufferPosition += count;
-            }
-            else
-            {
-                FlushWriteBuffer();
-
-
-                if (count >= WRITE_BUFFER_SIZE)
+                if (len_left >= WRITE_BUFFER_SIZE)
                 {
-                    _session.RequestWrite(_handle, (ulong)_position, buffer, wait);
+                    len = WRITE_BUFFER_SIZE;
+
+                    Buffer.BlockCopy(buffer, pos, _writeBuffer, 0, len);
+                    len_left -= len;
+                    pos += len;
+
+                    _session.RequestWrite(_handle, (ulong)_position, _writeBuffer, wait);
+                    _position += len;
+
                 }
                 else
                 {
-                    Buffer.BlockCopy(buffer, offset, _writeBuffer, _writeBufferPosition, count);
-                    _writeBufferPosition += count;
-                }
-            }
-            // Advance the buffer and stream positions.
-                _position += count;
-               // offset += tempLen;
-               // count -= tempLen;
-          //  }
+                    len = len_left;
 
-            // If the buffer is full, then do a speculative flush now,
-            // rather than waiting for the next call to this method.
-            if (_writeBufferPosition == WRITE_BUFFER_SIZE)
-            {
-                _session.RequestWrite(_handle, (ulong)(_position - WRITE_BUFFER_SIZE), _writeBuffer, wait);
-                _writeBufferPosition = 0;
+                    Buffer.BlockCopy(buffer, pos, buf_tail, 0, len);
+                    len_left -= len;
+                    pos += len;
+
+                    _session.RequestWrite(_handle, (ulong)_position, buf_tail, wait);
+                    _position += len;
+                }
+
             }
+
         }
 
 

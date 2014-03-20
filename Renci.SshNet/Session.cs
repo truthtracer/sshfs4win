@@ -28,12 +28,12 @@ namespace Renci.SshNet
         /// <summary>
         /// Specifies maximum packet size defined by the protocol.
         /// </summary>
-        protected const int MAXIMUM_PACKET_SIZE = 35000;
+        public const int MAXIMUM_PACKET_SIZE = 35000;
 
         /// <summary>
         /// Specifies maximum payload size defined by the protocol.
         /// </summary>
-        protected const int MAXIMUM_PAYLOAD_SIZE = 1024 * 32 * 2;
+        public const int MAXIMUM_PAYLOAD_SIZE = 1024 * 32;
 
         private static RNGCryptoServiceProvider _randomizer = new System.Security.Cryptography.RNGCryptoServiceProvider();
 
@@ -664,14 +664,14 @@ namespace Renci.SshNet
 
             var messageData = message.GetBytes();
 
-            if (messageData.Length > Session.MAXIMUM_PAYLOAD_SIZE)
-            {
-                //throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Payload cannot be more then {0} bytes.", Session.MAXIMUM_PAYLOAD_SIZE));
-            }
-
             if (this._clientCompression != null)
             {
                 messageData = this._clientCompression.Compress(messageData);
+            }
+
+            if (messageData.Length > Session.MAXIMUM_PAYLOAD_SIZE)
+            {
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Payload cannot be more then {0} bytes.", Session.MAXIMUM_PAYLOAD_SIZE));
             }
 
             var packetLength = messageData.Length + 4 + 1; //  add length bytes and padding byte
