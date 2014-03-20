@@ -7,8 +7,6 @@ Renci.SshNet.rev34720 & fixed sshfs bugs including :
 [fixed]Can't create files from context menu under mounted drivers<br>
 [fixed]Driver letter "Z" nerver appeared<br>
 [fixed]can't delete directory with sub direcotories<br>
-
-known issue:<br>
-office 2007 can't open .doc file with permission error, other office files worked well<br>
+[fixed]support GetFileSecurity/LockFile/UnLockFile APIs (ms office can't open .doc files, svn/hg also need file locking features to work)<br>
 
 Report Bugs via : TruthTracer@gmail.com
