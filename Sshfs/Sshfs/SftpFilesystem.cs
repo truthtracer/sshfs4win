@@ -498,10 +498,10 @@ namespace Sshfs
                     var stream = (info.Context as SftpContext).Stream;
                     lock (stream)
                     {
-                        //stream.Position = offset;
+                        stream.Position = offset;
                         stream.Write(buffer, 0, buffer.Length);
                     }
-                    //    stream.Flush();
+                    //stream.Flush();
                     bytesWritten = buffer.Length;
                     // TODO there are still some apps that don't check disk free space before write
                 }
